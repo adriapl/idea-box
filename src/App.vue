@@ -20,10 +20,10 @@
         <p class="user-actions" v-if="!user">
           Please
           <a @click="doLogin" href="#">login</a>
-          first
+          first.
         </p>
         <p class="user-actions" v-else>
-          Hi {{ user.displayName }}.<a @click="doLogout" href="#"> Logout</a>.
+          Hi {{ user.displayName }}. <a @click="doLogout" href="#">Logout</a>.
         </p>
       </section>
       <AppIdea v-for="(idea, $index) in ideas" :key="$index" :idea="idea" />
