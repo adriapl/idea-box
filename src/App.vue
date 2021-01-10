@@ -16,16 +16,34 @@
 <script>
 import AppIdea from "./components/AppIdea";
 import AddIdea from "./components/AddIdea";
-import mock from "@/mock.json";
 import { ref } from "vue";
 import { auth, firebase, db } from "@/firebase.js";
 export default {
   name: "App",
   setup() {
-    const ideas = ref(mock.ideas);
+    const ideas = ref([]);
 
     let user = ref(null);
     auth.onAuthStateChanged(async (auth) => (user.value = auth ? auth : null));
+
+    db.collection("ideas").onSnapshot((snapshot) => {
+      const newIdeas = [];
+      snapshot.docs.forEach(
+        (doc) => {
+          const { name, user, userName, votes } = doc.data();
+          let id = doc.id;
+          newIdeas.push({
+            name,
+            user,
+            userName,
+            votes,
+            id
+          });
+          ideas.value = newIdeas;
+        },
+        (error) => console.error(error)
+      );
+    });
 
     const doLogin = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
