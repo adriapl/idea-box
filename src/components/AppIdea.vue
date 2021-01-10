@@ -14,11 +14,13 @@
       <nav class="flex justify-center sm:block">
         <img
           class="w-10 cursor-pointer"
+          @click="voteIdea(true)"
           src="@/assets/img/arrow.svg"
           alt="Vote up"
         />
         <img
           class="w-10 cursor-pointer transform rotate-180"
+          @click="voteIdea(false)"
           src="@/assets/img/arrow.svg"
           alt="Vote down"
         />
@@ -30,11 +32,16 @@
 <script>
 export default {
   name: "AppIdea",
+  emits: ["vote-idea"],
   props: {
     idea: {
       type: Object,
       required: true
     }
+  },
+  setup(props, { emit }) {
+    const voteIdea = (type) => emit("vote-idea", { type, id: props.idea.id });
+    return { voteIdea };
   }
 };
 </script>
