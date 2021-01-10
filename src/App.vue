@@ -2,30 +2,12 @@
   <div class="container mx-auto p-4">
     <div class="w-full bg-gray-100 shadow-lg p-4 rounded-lg">
       <h1 class="mb-5 text-4xl text-center">IdeaBox</h1>
-      <section class="mb-6">
-        <form class="sm:flex">
-          <input
-            class="w-full p-3 sm:flex-auto"
-            type="text"
-            required
-            placeholder="Add your idea"
-          />
-          <input
-            v-if="user"
-            class="w-full p-2 bg-gray-600 text-white sm:flex-1"
-            type="submit"
-            value="Add idea"
-          />
-        </form>
-        <p class="user-actions" v-if="!user">
-          Please
-          <a @click="doLogin" href="#">login</a>
-          first.
-        </p>
-        <p class="user-actions" v-else>
-          Hi {{ user.displayName }}. <a @click="doLogout" href="#">Logout</a>.
-        </p>
-      </section>
+      <AddIdea
+        :user="user"
+        @do-login="doLogin"
+        @do-logout="doLogout"
+        @add-idea="addIdea"
+      />
       <AppIdea v-for="(idea, $index) in ideas" :key="$index" :idea="idea" />
     </div>
   </div>
@@ -33,9 +15,10 @@
 
 <script>
 import AppIdea from "./components/AppIdea";
+import AddIdea from "./components/AddIdea";
 import mock from "@/mock.json";
 import { ref } from "vue";
-import { auth, firebase } from "@/firebase.js";
+import { auth, firebase, db } from "@/firebase.js";
 export default {
   name: "App",
   setup() {
@@ -62,10 +45,24 @@ export default {
       }
     };
 
-    return { ideas, user, doLogin, doLogout };
+    const addIdea = async (data) => {
+      try {
+        await db.collection("ideas").add({
+          name: data.value,
+          user: user.value.uid,
+          userName: user.value.displayName,
+          votes: 0
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    return { ideas, user, doLogin, doLogout, addIdea };
   },
   components: {
-    AppIdea
+    AppIdea,
+    AddIdea
   }
 };
 </script>
